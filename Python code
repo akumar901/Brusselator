@@ -1,0 +1,110 @@
+# Divya Swaminathan & Amar Kumar
+# To generate Figure 14 from Gillespie's 1977 paper
+
+import sys
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Brusselator equation system
+# A -> X with rate constant c1 or k1
+# B+X -> Y+C with rate constant c2 or k2
+# 2X+Y -> 3X with rate constant c3 or k3
+# X -> D with rate constant c4 or k4
+# A,B,C,D are constants
+
+# Initialize
+
+# Parameters
+##c1A = 50000
+##c2B = 50
+##c3 = 0.00005
+##c4 = 5
+
+c1A = 2.0*100
+c2B = 6.0
+c3 = 1.0
+c4 = 1.0
+
+# Maximum  & Start Simulation time
+Tmax = 30.0
+Tint = 0.0
+
+# Species
+
+x = []
+y = []
+time= []
+xint = 0.0
+yint = 0.0
+x.append(xint)
+y.append(yint)
+time.append(Tint)
+xf=0.0
+yf=0.0
+
+print('x',x)
+print('y',y)
+
+
+
+# Propensities
+num_of_propensities = 4
+a = np.zeros(num_of_propensities)
+a[0] = c1A
+
+##
+##
+### Check if you are uniformaly picking out time
+##
+####t = np.zeros(num_of_timepoints)
+####for i in range(1, num_of_timepoints):
+####    t[i] = np.random.random(1)
+####
+####fig = plt.hist(t)
+####plt.show()
+
+
+i = 0
+while Tint < Tmax:
+    
+      a[1]=  c2B*xint
+      a[2] = (c3*xint*(xint-1)*yint)/10000
+      a[3] = c4*xint
+      a0 = sum(a)
+    #
+      z1 = np.random.random(1)
+    # Select next reaction time
+      if z1 != 0:
+         dt = -np.log(z1)/a0
+         Tint = Tint +dt
+         print('*',i,dt, Tint)
+
+    # Select next reaction mu   
+      z2 = np.random.random(1)*a0
+      print('z2', z2)   
+      if z2 <= a[0]:
+          xf = xint+1
+      elif ((z2 > a[0]) & (z2<= a[0]+a[1])):
+          xf = xint-1
+          yf = yint+1
+      elif ((z2 > a[0]+a[1]) & (z2<= a[0]+a[1]+a[2])):
+          xf = xint+1
+          yf = yint-1
+      elif ((z2 > a[0]+a[1]+a[2]) & (z2 <= a0)):
+          xf = xint-1
+     # Update xint and append x and y
+      xint = xf
+      yint = yf
+      x.append(xint)
+      y.append(yint)
+      time.append(Tint)
+      print('**',Tint,xint,yint)
+##      i+=1
+
+print(time)
+fig = plt.plot(time,x,'-')
+plt.show()
+fig2 = plt.plot(time,y,'-.')
+plt.show()
+fig3 = plt.plot(x,y,'*')
+plt.show()
